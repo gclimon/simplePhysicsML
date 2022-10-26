@@ -44,10 +44,11 @@ def loadData(files, variables, get_PS_times=False):
             else:
                 if var != 'lat':
                     data_dict[var] = np.concatenate((data_dict[var],data[var]))
-                ps = np.empty((dataset.time.size,1,dataset.lat.size,dataset.lon.size))
-                ps[:,0,:,:] = dataset['PS'].values
-                PS = np.concatenate((PS,ps))
-                times = np.concatenate((times,dataset['time'].values))
+                if ivar ==0:
+                    ps = np.empty((dataset.time.size,1,dataset.lat.size,dataset.lon.size))
+                    ps[:,0,:,:] = dataset['PS'].values
+                    PS = np.concatenate((PS,ps))
+                    times = np.concatenate((times,dataset['time'].values))
     if get_PS_times:
         return data_dict, PS, times
     else:
@@ -208,7 +209,7 @@ def weighted_avg_std(values, axis, weights):
     variance = np.average((values-average)**2, axis=axis, weights=weights)
     return (average, np.sqrt(variance))
 
-def scale_ui(data, fill=[], l_weights=None, test=False):
+def scale_ui(data, fill=[], l_weights=None, v_weights=None, test=False):
     """
     Preprocessing function that scales data to become unitarily invariant for machine learning. This simply 
     means we subtract the mean and divide by the standard deviation.
@@ -217,9 +218,11 @@ def scale_ui(data, fill=[], l_weights=None, test=False):
     std = data.std(axis=0).std(axis=1)
     if l_weights is not None:
         mean,std = weighted_avg_std(mean, axis=0, weights=l_weights)
+        if v_weights is not None:
+            mean,std = weighted_avg_std(mean, axis=0, weights=v_weights)
     else:
-        mean = mean.mean(axis=0)
-        std = std.std(axis=0)
+        mean = mean.mean(axis=0).mean(axis=0)
+        std = std.std(axis=0).mean(axis=0)
     new_data = (data - mean) / std
     if test:                        
         return new_data, mean, std

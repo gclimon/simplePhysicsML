@@ -2,52 +2,55 @@ import numpy as np
 import xarray as xr
 import functions
 
-inspect_data = False
+inspect_data = True
 
 # Assign runtype
 run_type = 'CLDERA' # options: HS, TJ, TJBM
-label = ''
+opt = 'passive' # optionsL: allActive
+label = 'T_30'
+lag = 30 * 4
+Ntrain = 100 * 4
+Ntest = 10 * 4
+xTrainStart = 0
+yTrainStart = lag
+xTrainStop = Ntrain - lag
+yTrainStop = Ntrain
+print(xTrainStart, xTrainStop, xTrainStop - xTrainStart)
+print(yTrainStart, yTrainStop, yTrainStop - yTrainStart)
+
+xTestStart = -Ntest - lag
+yTestStart = -Ntest
+xTestStop = -lag
+print(xTestStart, xTestStop, xTestStop - xTestStart)
+print(yTestStart, - yTestStart)
 
 # Choose attributes
-features = ['T','P','lat']
+features = ['T','P','U','V','SAI_AOD']
 
 if 'lat' in features:
     LAT = True
 else:
     LAT = False
 
-n_train = 
-raw = True
+raw = False
 chop_levs = 0
 
-out_dir = '/glade/work/glimon/simplePhysML//data/'
-data_filename = (run_type+'_'+label+'.npz')
+out_dir = '/glade/work/glimon/simplePhysML/CLDERA/data/'
+data_filename = run_type+'_'+label+'.npz'
+inspect_output = '/glade/scratch/glimon/simplePhysML/CLDERA/data/'
 
 print('filename:',data_filename)
-print('Resolution:', res)
 print('Features:', features)
 print('Label:', label)
 
 # Define feature filenames and assign label filenames
-train_feature_files = [
-    '/glade/work/glimon/ml_data/'+run_type+'/'+'',
-    '/glade/work/glimon/ml_data/'+run_type+'/'+'',
-    '/glade/work/glimon/ml_data/'+run_type+'/'+'',
-    '/glade/work/glimon/ml_data/'+run_type+'/'+'',
-    '/glade/work/glimon/ml_data/'+run_type+'/'+'']
-
-test_feature_files = [    
-    '/glade/work/glimon/ml_data/'+run_type+'/'+'']
+data_files = [
+    '/glade/work/glimon/ml_data/'+run_type+'/release_090822/netcdf/'+opt+'/'+'E3SM_ne16_L72_FIDEAL_SAI_'+opt+'.eam.h0.0001-01-01-00000.regrid.2x2.nc',
+    '/glade/work/glimon/ml_data/'+run_type+'/release_090822/netcdf/'+opt+'/'+'E3SM_ne16_L72_FIDEAL_SAI_'+opt+'.eam.h0.0001-04-01-00000.regrid.2x2.nc']
+#    '/glade/work/glimon/ml_data/'+run_type+'/release_090822/netcdf/'+opt+'/'+'E3SM_ne16_L72_FIDEAL_SAI_'+opt+'.eam.h0.0001-06-30-00000.regrid.2x2.nc']
 
 
-train_label_files = []
-for f in train_feature_files:
-    train_label_files.append(f.replace('.h0.','.h1.'))
-test_label_files = []
-for f in test_feature_files:
-    test_label_files.append(f.replace('.h0.','.h1.'))
-
-ds = xr.open_dataset(train_feature_files[0])
+ds = xr.open_dataset(data_files[0])
 D = {}
 
 # Get Weights
@@ -61,95 +64,83 @@ eta = hyai + hybi
 v_weights = eta[1:] - eta[:-1]
 l_weights = np.cos(np.deg2rad(lat))
 
+
 # Load data
-training_features = functions.loadData(train_feature_files[0:n_train],features)
-training_labels = functions.loadData(train_label_files[0:n_train],[label])
-testing_features = functions.loadData(test_feature_files,features)
-testing_labels, PS, time = functions.loadData(test_label_files,[label],get_PS_times=True)
-PS = PS[-312:]
-time = time[-312:]
+dataDict, PS, time = functions.loadData(data_files, features, get_PS_times=True)
+print('PS',PS.shape)
+print('time',time.shape)
 
-# Arange data into single array
-training_features = functions.arangeArrays(training_features,features)[53:] # Disregard first year (spin-up data)
-training_labels = functions.arangeArrays(training_labels,[label])[53:]
-testing_features = functions.arangeArrays(testing_features,features)[-312:] # Take final six years
-testing_labels = functions.arangeArrays(testing_labels,[label])[-312:]
-
+data = functions.arangeArrays(dataDict,features)
+print('data',data.shape)
 if inspect_data:
-    D = functions.fill_dict(D,testing_features,time,lev,lat,lon,features,'raw')
-    D = functions.fill_dict(D,testing_labels,time,lev,lat,lon,[label],'raw')
-
-print(training_features.shape)
-print(training_labels.shape)
-print(testing_features.shape)
-print(testing_labels.shape)
+    D = functions.fill_dict(D,data,time,lev,lat,lon,features,'raw')
 
 # Roll data axes
-training_features = functions.roll_axes(training_features)
-training_labels = functions.roll_axes(training_labels)
-testing_features = functions.roll_axes(testing_features)
-testing_labels = functions.roll_axes(testing_labels)
-
-print(training_features.shape)
-print(training_labels.shape)
-print(testing_features.shape)
-print(testing_labels.shape)
+data = functions.roll_axes(data)
+print(data.shape)
+if inspect_data:
+    D = functions.fill_dict(D,np.rollaxis(data,3,1),time,lev,lat,lon,features,'1_1')
 
 if not raw:
-
     # Subtract the mean and divide by the standard deviation
-    training_features = functions.scale_ui(training_features, l_weights=l_weights, v_weights=v_weights, lat=True)
-    training_labels = functions.scale_ui(training_labels, l_weights=l_weights, v_weights=v_weights)
-    testing_features = functions.scale_ui(testing_features, l_weights=l_weights, v_weights=v_weights, lat=True)
-    testing_labels, mean, std = functions.scale_ui(testing_labels, l_weights=l_weights, v_weights=v_weights, 
-                                                   test=True) 
-
+    data, mean, std = functions.scale_ui(data, l_weights=l_weights, v_weights=v_weights, test=True) 
     if inspect_data:
-        D = functions.fill_dict(D,np.rollaxis(testing_features,3,1),time,lev,lat,lon,features,'ui')
-        D = functions.fill_dict(D,np.rollaxis(testing_labels,3,1),time,lev,lat,lon,[label],'ui')
+        D = functions.fill_dict(D,np.rollaxis(data,3,1),time,lev,lat,lon,features,'ui')
 
     # Scale data to range [-1,1] 
-    training_features = functions.scale_ab(training_features,lat=LAT)
-    training_labels = functions.scale_ab(training_labels,a=0)
-    testing_features = functions.scale_ab(testing_features,lat=LAT)
-    testing_labels, dmin, dmax = functions.scale_ab(testing_labels,a=0,test=True)
+    data, dmin, dmax = functions.scale_ab(data,a=0,test=True)
+    if inspect_data:
+        D = functions.fill_dict(D,np.rollaxis(data,3,1),time,lev,lat,lon,features,'1_1')
 
 if inspect_data:
-    D = functions.fill_dict(D,np.rollaxis(testing_features,3,1),time,lev,lat,lon,features,'1_1')
-    D = functions.fill_dict(D,np.rollaxis(testing_labels,3,1),time,lev,lat,lon,[label],'1_1')
-    
-if inspect_data:
-    xr.Dataset(D).to_netcdf(out_dir+'inspect.nc')
+    xr.Dataset(D).to_netcdf(inspect_output+run_type+'_'+label+'.nc')
 
-if chop_levs > 0: # Some fields are zero top of the atmosphere, if so we can remove these levels if we want
-    print("chopping")
-    training_features = training_features[:,:,:,chop_levs:,:] 
-    training_labels = training_labels[:,:,:,chop_levs:,:]
-    testing_features = testing_features[:,:,:,chop_levs:,:]
-    testing_labels = testing_labels[:,:,:,chop_levs:,:]
-    print(training_features.shape)
-    print(training_labels.shape)
-    print(testing_features.shape)
-    print(testing_labels.shape)
 
-# Reshape data
-training_features = functions.reshape(training_features)
-training_labels = functions.reshape(training_labels)
-testing_features = functions.reshape(testing_features)
-testing_labels, testing_label_shape = functions.reshape(testing_labels, test=True)
 
-print(training_features.shape)
-print(training_labels.shape)
-print(testing_features.shape)
-print(testing_labels.shape)
+trainX = data[xTrainStart:xTrainStop]
+trainy = data[yTrainStart:yTrainStop,:,:,:,0:1]
+testX = data[xTestStart:xTestStop]
+testy = data[yTestStart:,:,:,:,0:1]
+PSx = PS[xTestStart:xTestStop]
+timex = time[xTestStart:xTestStop]
+PSy = PS[yTestStart:]
+timey = time[yTestStart:]
+
+# # Reshape data
+# trainX = functions.reshape(trainX)
+# trainy = functions.reshape(trainy)
+# testX = functions.reshape(testX)
+# testy, testy_shape = functions.reshape(testy, test=True)
+print("split data shapes:")
+print(trainX.shape)
+print(trainy.shape)
+print(testX.shape)
+print(testy.shape)
 
 # Save array(s) to disk
 np.savez(out_dir+data_filename,
-         train_x = training_features,
-         train_y = training_labels,
-         test_x = testing_features,
-         test_y = testing_labels,
-         test_y_shape = testing_label_shape,
+         train_x = trainX,
+         train_y = trainy,
+         test_x = testX,
+         test_y = testy,
+         mean = mean,
+         std = std,
+         dmin = dmin,
+         dmax = dmax,
+         time = time,
          PS = PS,
-         time = time)
+         PSx = PSx,
+         timex = timex,
+         PSy = PSy,
+         timey = timey)
 
+# if chop_levs > 0: # Some fields are zero top of the atmosphere, if so we can remove these levels if we want
+#     print("chopping")
+#     trainX = trainX[:,:,:,chop_levs:,:] 
+#     trainy = trainy[:,:,:,chop_levs:,:]
+#     testX = testX[:,:,:,chop_levs:,:]
+#     testy = testy[:,:,:,chop_levs:,:]
+#     print(trainX.shape)
+#     print(trainy.shape)
+#     print(testX.shape)
+#     print(testy.shape)
