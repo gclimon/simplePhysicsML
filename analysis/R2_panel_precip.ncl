@@ -18,8 +18,8 @@ begin
 ; GIVEN AS (time,lev,lat,lon) from 0 to end_time-1
 ;=================================================;
 
-  fname = "R2.nc"
-  path = "/glade/work/glimon/simplePhysML/19/"
+  fname = "R2_50trees.nc"
+  path = "/glade/scratch/glimon/simplePhysML/19/"
   moist = path+"TJ/"
   conv = path+"TJBM/"
   ; ddT = addfile(dry + "PTTEND/rf/"+fname,"r")
@@ -27,7 +27,7 @@ begin
   ; cdT = addfile(conv + "PTTEND/rf/"+fname,"r")
   ; mdQ = addfile(moist + "PTEQ/rf/"+fname,"r")
   ; cdQ = addfile(conv + "PTEQ/rf/"+fname,"r")
-  mPL = addfile(moist + "PRECL/rf/"+fname,"r")
+  mPL = addfile(moist + "PRECL/rf/R2_aug.nc","r")
   cPL = addfile(conv + "PRECL/rf/"+fname,"r")
   cPC = addfile(conv + "PRECC/rf/"+fname,"r")
 
@@ -37,7 +37,7 @@ begin
 ;  pltType = "X11"
 ;  pltType = "png"
   pltType = "eps"
-  panelSize = (/2,2/)    ; panel dimensions
+  panelSize = (/1,1/)    ; panel dimensions
   version   = ""
 
   lat  = mPL->lat
@@ -52,10 +52,15 @@ begin
   R2cPL = cPL->R2(:)
   R2cPC = cPC->R2(:)
 
+  R2cP = new((/3,dimsizes(R2cPL)/),double)
+  R2cP(0,:) = R2mPL
+  R2cP(1,:) = R2cPL
+  R2cP(2,:) = R2cPC
+
   wks  = gsn_open_wks(pltType,name+version)
   gsn_define_colormap(wks,"WhViBlGrYeOrRe")
 
-plot = new(4,graphic)
+plot = new(1,graphic)
 
 	res1                      = True
 	res1@gsnDraw              = False          		; panel plot 
@@ -97,6 +102,9 @@ plot = new(4,graphic)
 ;        pres@gsnPanelMainString       = ""  ; Adjust name!
         pres@gsnPanelMainFontHeightF  = 0.015
 
+	res1@xyLineThicknesses = (/  1.0, 1.0, 1.0/)          ; make second line thicker
+	res1@xyLineColors      = (/"orange","blue","black"/)          ; change line color
+
 	res1@cnLevelSelectionMode = "ExplicitLevels" 
         res1@cnLevels = (/0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.99/)
 	res1@lbLabelStrings = (/"0.0", "0.1", "0.2", "0.3", "0.4", "0.5", "0.6", "0.7", "0.8", "0.9", "0.95", "0.99"/)
@@ -108,22 +116,33 @@ plot = new(4,graphic)
 	; res1@vpWidthF             = 0.5                         ; set aspect ratio
 	; res1@vpHeightF            = 0.25                        ; set aspect ratio
 
+	res1@pmLegendDisplayMode    = "Always"            ; turn on legend
+  	res1@pmLegendSide           = "Top"               ; Change location of 
+  	res1@pmLegendParallelPosF   = .15                  ; move units ri
+	res1@pmLegendOrthogonalPosF = -1.                ; move units down
+  	res1@pmLegendWidthF         = 0.05                ; Change width and
+  	res1@pmLegendHeightF        = 0.08                ; height of legend.
+  	res1@lgPerimOn              = False               ; turn off box around
+  	res1@lgLabelFontHeightF     = .01                 ; label font height
+  	res1@xyExplicitLegendLabels = (/"Moist Large Scale","Convection Large Scale","Convection Convective"/)         ; create explicit labels
+
         res1@gsnPanelMainFontHeightF  = 0.01
 	res1@trYReverse           = False      			; reverses y-axis, fals
 	res1@trYMaxF = 1.00
-	; res1@trYMinF = 0.75
+;	res1@trYMinF = 0.80
+	res1@trYMinF = 0.87
 	res1@gsnRightString = ""
 	res1@tiYAxisString   = "R2"
-	res1@gsnLeftString = "Moist"
-	res1@gsnCenterString = "Large-Scale Precip"
-	plot(0) = gsn_csm_xy(wks,lat,R2mPL(:),res1)	; plot var
+	res1@gsnLeftString = ""
+	res1@gsnCenterString = "Precipitation"
+;	plot(0) = gsn_csm_xy(wks,lat,R2mPL(:),res1)	; plot var
 
-	res1@gsnLeftString = "Convection"
-	res1@gsnCenterString = "Large-Scale Precip"
-	plot(1) = gsn_csm_xy(wks,lat,R2cPL(:),res1)	; plot var
+;	res1@gsnLeftString = "Convection"
+;	res1@gsnCenterString = "Convection Precip"
+;	plot(0) = gsn_csm_xy(wks,lat,R2cPL(:),res1)	; plot var
 
-	res1@gsnCenterString = "Convectve Precip"
-	plot(3) = gsn_csm_xy(wks,lat,R2cPC(:),res1)	; plot var
+;	res1@gsnCenterString = "Convectve Precip"
+	plot(0) = gsn_csm_xy(wks,lat,R2cP,res1)	; plot var
 
 	gsn_panel(wks,plot,panelSize,pres)			; panel plot
 	frame(wks)

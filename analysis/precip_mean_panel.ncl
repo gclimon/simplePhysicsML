@@ -20,11 +20,11 @@ begin
 
 
 
-  path = "/glade/work/glimon/simplePhysML/19/"
+  path = "/glade/scratch/glimon/simplePhysML/19/"
   moist = path+"TJ/"
   conv = path+"TJBM/"
   fname = "results.nc"
-  mPL_f = addfile(moist + "PRECL/rf/"+fname,"r")
+  mPL_f = addfile(moist + "PRECL/rf/results_aug.nc","r")
   cPL_f = addfile(conv + "PRECL/rf/"+fname,"r")
   cPC_f = addfile(conv + "PRECC/rf/"+fname,"r")
 

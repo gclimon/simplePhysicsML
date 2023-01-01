@@ -4,11 +4,11 @@ from matplotlib import pyplot as plt
 import xarray as xr
 import numpy as np
 
-data_dir = '/glade/work/glimon/simplePhysML/19/'
+data_dir = '/glade/scratch/glimon/simplePhysML/19/'
 fn = 'rf/results.nc'
-mPL = xr.open_dataset(data_dir + 'TJ/PRECL/' + fn)
-cPL = xr.open_dataset(data_dir + 'TJBM/PRECL/' + fn)
-cPC = xr.open_dataset(data_dir + 'TJBM/PRECC/' + fn)
+mPL = xr.open_dataset(data_dir + 'TJ/PRECL/rf/results_aug.nc')
+cPL = xr.open_dataset(data_dir + 'TJBM/PRECL/rf/results_50trees.nc')
+cPC = xr.open_dataset(data_dir + 'TJBM/PRECC/rf/results_50trees.nc')
 
 lat = mPL['lat'].values
 lon = mPL['lon'].values
@@ -88,4 +88,4 @@ ax[1,1].legend(fontsize=5, loc='lower right')
 
 fig.tight_layout()
 
-plt.savefig('scatter.png',dpi=300)
+plt.savefig('scatter_precip.png',dpi=300)

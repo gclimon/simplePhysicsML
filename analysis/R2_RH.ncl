@@ -19,9 +19,9 @@ begin
 ;=================================================;
 
 
-  path = "/glade/scratch/glimon/ml_climate/19L/"
-  moist = path+"moist/"
-  wRH  = addfile(moist + "PTEQ/rf/R2_wRH.nc" ,"r")
+  path = "/glade/scratch/glimon/simplePhysML/19/"
+  moist = path+"TJ/"
+  wRH  = addfile(moist + "PTEQ/rf/R2_aug.nc" ,"r")
   noRH = addfile(moist + "PTEQ/rf/R2_noRH.nc","r")
 
   name = "R2_RH"

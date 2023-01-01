@@ -6,11 +6,11 @@ import xarray as xr
 import numpy as np
 
 
-data_dir = '/glade/work/glimon/simplePhysML/19/'
-fn = 'rf/results.nc'
-mdT = xr.open_dataset(data_dir + 'TJ/PTTEND/' + fn)
+data_dir = '/glade/scratch/glimon/simplePhysML/19/'
+fn = 'rf/results_50trees.nc'
+mdT = xr.open_dataset(data_dir + 'TJ/PTTEND/rf/results_aug.nc')
 cdT = xr.open_dataset(data_dir + 'TJBM/PTTEND/' + fn)
-mdQ = xr.open_dataset(data_dir + 'TJ/PTEQ/' + fn)
+mdQ = xr.open_dataset(data_dir + 'TJ/PTEQ/rf/results_aug.nc')
 cdQ = xr.open_dataset(data_dir + 'TJBM/PTEQ/' + fn)
 
 lat = mdT['lat'].values
@@ -45,7 +45,7 @@ n_bins = 100
 # lgbins3 = np.logspace(start=np.log(cdQ_diff.min()), stop=np.log(cdQ_diff.min()), num=500)
 
 fig, ax = plt.subplots(2,2)
-ax[0,0].text(-15.0, 1e6, 'a)', 
+ax[0,0].text(-28.0, 1e6, 'a)', 
              fontsize='medium', verticalalignment='top', fontfamily='serif',
              bbox=dict(facecolor='w', edgecolor='none', pad=3.0))
 h1 = ax[0,0].hist(mdT_diff, bins=n_bins)
@@ -62,23 +62,24 @@ for i in sorted_h1_ind[::-1]:
 print(percent_h1)
 print(i_h1)
 h1_min = min(i_h1)
-h1_max = max(i_h1)
-ax[0,0].axvline(x=h1[1][h1_min], color='k', linestyle='dashed', linewidth=0.5,label='>97%')
+h1_max = max(i_h1)+1
+ax[0,0].axvline(x=h1[1][h1_min], color='k', linestyle='dashed', linewidth=0.5,label='>95%')
 ax[0,0].axvline(x=h1[1][h1_max], color='k', linestyle='dashed', linewidth=0.5)
 # ax[0,0].set_xticks(list(ax[0,0].get_xticks()) + [-15., -5., 5., 15.])
-ax[0,0].xaxis.set_minor_locator(ticker.MultipleLocator(5))
+# ax[0,0].xaxis.set_minor_locator(ticker.MultipleLocator(5))
 ax[0,0].set_title('Moist dT/dt near 850 hPa')
 ax[0,0].set_ylabel('N')
 ax[0,0].set_xlabel('ML - CAM (K/day)')
 ax[0,0].set_yscale("log")
 ax[0,0].legend(fontsize=6)
+ax[0,0].set_xlim((-30,30))
 # ax[0,0].yaxis.set_major_formatter(ticker.PercentFormatter(xmax=len(mdT_diff)))
 
-ax[0,1].text(-15.0, 1e6, 'b)', 
+ax[0,1].text(-28.0, 1e6, 'b)', 
              fontsize='medium', verticalalignment='top', fontfamily='serif',
              bbox=dict(facecolor='w', edgecolor='none', pad=3.0))
 h2 = ax[0,1].hist(cdT_diff, bins=n_bins)
-h2_percent = np.asarray(h2[0])/len(mdT_diff)
+h2_percent = np.asarray(h2[0])/len(cdT_diff)
 sorted_h2_ind = np.argsort(h2_percent)
 percent_h2 = 0.
 i_h2 = []
@@ -91,20 +92,21 @@ for i in sorted_h2_ind[::-1]:
 print(percent_h2)
 print(i_h2)
 h2_min = min(i_h2)
-h2_max = max(i_h2)
+h2_max = max(i_h2)+1
 ax[0,1].axvline(x=h2[1][h2_min], color='k', linestyle='dashed', linewidth=0.5, label='>95%')
 ax[0,1].axvline(x=h2[1][h2_max], color='k', linestyle='dashed',linewidth=0.5)
 # ax[0,1].set_xticks(list(ax[0,1].get_xticks()) + [-15., -5., 5., 15.])
 # ax[0,1].xaxis.set_major_locator(plt.MaxNLocator(3))
-ax[0,1].xaxis.set_minor_locator(ticker.MultipleLocator(5))
+# ax[0,1].xaxis.set_minor_locator(ticker.MultipleLocator(5))
 ax[0,1].set_title('Convection dT/dt near 850 hPa')
 ax[0,1].set_ylabel('N')
 ax[0,1].set_xlabel('ML - CAM (K/day)')
 ax[0,1].set_yscale("log")
 ax[0,1].legend(fontsize=6)
+ax[0,1].set_xlim((-30,30))
 # ax[0,1].yaxis.set_major_formatter(ticker.PercentFormatter(xmax=len(cdT_diff)))
 
-ax[1,0].text(-12.0, 1e6, 'c)', 
+ax[1,0].text(-14.0, 1e6, 'c)', 
              fontsize='medium', verticalalignment='top', fontfamily='serif',
              bbox=dict(facecolor='w', edgecolor='none', pad=3.0))
 h3 = ax[1,0].hist(mdQ_diff, bins=n_bins)
@@ -121,7 +123,7 @@ for i in sorted_h3_ind[::-1]:
 print(percent_h3)
 print(i_h3)
 h3_min = min(i_h3)
-h3_max = max(i_h3)
+h3_max = max(i_h3)+1
 ax[1,0].axvline(x=h3[1][h3_min], color='k', linestyle='dashed', linewidth=0.5,label='>95%')
 ax[1,0].axvline(x=h3[1][h3_max], color='k', linestyle='dashed', linewidth=0.5)
 ax[1,0].set_title('Moist dq/dt near 850 hPa')
@@ -129,13 +131,14 @@ ax[1,0].set_ylabel('N')
 ax[1,0].set_xlabel('ML - CAM (g/kg/day)')
 ax[1,0].set_yscale("log")
 ax[1,0].legend(fontsize=6)
+ax[1,0].set_xlim((-15,15))
 # ax[1,0].yaxis.set_major_formatter(ticker.PercentFormatter(xmax=len(mdQ_diff)))
 
-ax[1,1].text(-15.0, 1e6, 'd)', 
+ax[1,1].text(-14.0, 1e6, 'd)', 
              fontsize='medium', verticalalignment='top', fontfamily='serif',
              bbox=dict(facecolor='w', edgecolor='none', pad=3.0))
 h4 = ax[1,1].hist(cdQ_diff, bins=n_bins)
-h4_percent = np.asarray(h4[0])/len(mdT_diff)
+h4_percent = np.asarray(h4[0])/len(cdQ_diff)
 sorted_h4_ind = np.argsort(h4_percent)
 percent_h4 = 0.
 i_h4 = []
@@ -148,17 +151,18 @@ for i in sorted_h4_ind[::-1]:
 print(percent_h4)
 print(i_h4)
 h4_min = min(i_h4)
-h4_max = max(i_h4)
-ax[1,1].axvline(x=h4[1][h4_min], color='k', linestyle='dashed', linewidth=0.5,label='>95%')
+h4_max = max(i_h4)+1
+ax[1,1].axvline(x=h4[1][h4_min], color='k', linestyle='dashed', linewidth=0.5,label='>97%')
 ax[1,1].axvline(x=h4[1][h4_max], color='k', linestyle='dashed', linewidth=0.5)
 # ax[1,1].set_xticks(list(ax[1,1].get_xticks()) + [-15., -5., 5.])
 # ax[1,1].xaxis.set_major_locator(plt.MaxNLocator(5))
-ax[1,1].xaxis.set_minor_locator(ticker.MultipleLocator(5))
+# ax[1,1].xaxis.set_minor_locator(ticker.MultipleLocator(5))
 ax[1,1].set_title('Convection dq/dt near 850 hPa')
 ax[1,1].set_ylabel('N')
 ax[1,1].set_xlabel('ML - CAM (g/kg/day)')
 ax[1,1].set_yscale("log")
 ax[1,1].legend(fontsize=6)
+ax[1,1].set_xlim((-15,15))
 # ax[1,1].yaxis.set_major_formatter(ticker.PercentFormatter(xmax=len(cdQ_diff)))
 
 fig.tight_layout()

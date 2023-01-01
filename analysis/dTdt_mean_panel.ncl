@@ -18,16 +18,16 @@ begin
 ; GIVEN AS (time,lev,lat,lon) from 0 to end_time-1
 ;=================================================;
 
-  path = "/glade/work/glimon/simplePhysML/19/"
+  path = "/glade/scratch/glimon/simplePhysML/19/"
   dry = path+"HS/"
   moist = path+"TJ/"
   conv = path+"TJBM/"
-  fname = "results.nc"
+  fname = "results_50trees.nc"
   
   name = "dTdt_panel"
 
   ddT_f = addfile(dry + "PTTEND/rf/"+fname,"r")
-  mdT_f = addfile(moist + "PTTEND/rf/"+fname,"r")
+  mdT_f = addfile(moist + "PTTEND/rf/results_aug.nc","r")
   cdT_f = addfile(conv + "PTTEND/rf/"+fname,"r")
 
 ; output format
@@ -176,8 +176,8 @@ plot = new(9,graphic)
         ; res1@cnLevels = (/-0.6, -0.3, 0.0, 0.3, 0.6, 0.9, 1.2, 1.8, 2.4, 2.8/)
 	; res1@lbLabelStrings = (/"-0.6", "-0.3", "0.0", "0.3", "0.6", "0.9", "1.2", "1.8", "2.4", "2.8"/)
 
-        res1@cnMaxLevelValF  =   2.                 ; max contour color label
-        res1@cnMinLevelValF  =   -1.                  ; min contour color label
+        res1@cnMaxLevelValF  =   2.0                 ; max contour color label
+        res1@cnMinLevelValF  =   -2.0                  ; min contour color label
         res1@cnLevelSpacingF = 0.25                         ; contour color spacing
 
 	res1@gsnLeftString = "Dry dT/dt"
@@ -190,7 +190,7 @@ plot = new(9,graphic)
 
 	; res1@cnLevels = (/-0.015, -0.012, -0.009, -0.006, -0.003, 0.0, 0.003, 0.006, 0.009, 0.012/)	
 	; res1@lbLabelStrings = (/"-0.015", "-0.012", "-0.009", "-0.006", "-0.003", "0.0", "0.003", "0.006", "0.009", "0.012"/)	
-        res1@cnMaxLevelValF  =    0.012                 ; max contour color label
+        res1@cnMaxLevelValF  =    0.01                 ; max contour color label
         res1@cnMinLevelValF  =   -0.01                ; min contour color label
         res1@cnLevelSpacingF = 0.002                           ; contour color spacing
 
@@ -201,8 +201,8 @@ plot = new(9,graphic)
 	; res1@cnLevels = (/-2.0, -1.0, 0.0, 1.5, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0/)	
 	; res1@lbLabelStrings = (/"-2.0", "-1.0", "0.0", "1.5", "3.0", "4.0", "5.0", "6.0", "7.0", "8.0"/)	
         res1@cnMaxLevelValF  =    6.                 ; max contour color label
-        res1@cnMinLevelValF  =   -3.                  ; min contour color label
-        res1@cnLevelSpacingF = 1.                         ; contour color spacing
+        res1@cnMinLevelValF  =   -6.                  ; min contour color label
+        res1@cnLevelSpacingF = 1.0                         ; contour color spacing
 
 	res1@gsnCenterString = "CAM"
 	res1@gsnLeftString = "Moist dT/dt"
@@ -215,9 +215,9 @@ plot = new(9,graphic)
 
 	; res1@cnLevels = (/-0.08, -0.06, -0.04, -0.02, 0.0, 0.02, 0.04, 0.07, 0.10, 0.12/)	
 	; res1@lbLabelStrings = (/"-0.08", "-0.06", "-0.04", "-0.02", "0.0", "0.02", "0.04", "0.07", "0.10", "0.12"/)		
-        res1@cnMaxLevelValF  =    0.12                 ; max contour color label
-        res1@cnMinLevelValF  =   -0.08                 ; min contour color label
-        res1@cnLevelSpacingF = 0.02                           ; contour color spacing
+        res1@cnMaxLevelValF  =    0.05                 ; max contour color label
+        res1@cnMinLevelValF  =   -0.05                 ; min contour color label
+        res1@cnLevelSpacingF = 0.01                           ; contour color spacing
 
 	plot(5) = gsn_csm_contour(wks,mdT_diff_m(:,:),res1)	; plot var
 
@@ -225,8 +225,8 @@ plot = new(9,graphic)
 
 	; res1@cnLevels = (/-2.0, -1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5, 2.0, 2.3/)
 	; res1@lbLabelStrings = (/"-2.0", "-1.5", "-1.0", "-0.5", "0.0", "0.5", "1.0", "1.5", "2.0", "2.3"/)
-        res1@cnMaxLevelValF  =   2.5                 ; max contour color label
-        res1@cnMinLevelValF  =   -1.5                  ; min contour color label
+        res1@cnMaxLevelValF  =   2.0                 ; max contour color label
+        res1@cnMinLevelValF  =   -2.0                  ; min contour color label
         res1@cnLevelSpacingF = 0.5                         ; contour color spacing
 	res1@gsnCenterString = "CAM"
 	res1@gsnLeftString = "Conv. dT/dt"
@@ -239,7 +239,7 @@ plot = new(9,graphic)
 
 	; res1@cnLevels = (/-0.05, -0.03, -0.01, -0.005, 0.0, 0.005, 0.01, 0.03, 0.05, 0.06/)	
 	; res1@lbLabelStrings = (/"-0.05", "-0.03", "-0.01", "-0.005", "0.0", "0.005", "0.01", "0.03", "0.05", "0.06"/)	
-        res1@cnMaxLevelValF  =    0.06                 ; max contour color label
+        res1@cnMaxLevelValF  =    0.05                 ; max contour color label
         res1@cnMinLevelValF  =   -0.05                 ; min contour color label
         res1@cnLevelSpacingF =    0.01                           ; contour color spacing
 

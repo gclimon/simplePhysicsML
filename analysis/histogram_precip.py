@@ -5,9 +5,9 @@ import matplotlib.ticker as ticker
 import xarray as xr
 import numpy as np
 
-data_dir = '/glade/work/glimon/simplePhysML/19/'
-fn = 'rf/results.nc'
-mPL = xr.open_dataset(data_dir + 'TJ/PRECL/' + fn)
+data_dir = '/glade/scratch/glimon/simplePhysML/19/'
+fn = 'rf/results_50trees.nc'
+mPL = xr.open_dataset(data_dir + 'TJ/PRECL/rf/results_aug.nc')
 cPL = xr.open_dataset(data_dir + 'TJBM/PRECL/' + fn)
 cPC = xr.open_dataset(data_dir + 'TJBM/PRECC/' + fn)
 
@@ -34,7 +34,7 @@ cPC_diff  = np.reshape(cPC_diff,(shp[0]*shp[1]*shp[2]))
 n_bins = 100
 
 fig, ax = plt.subplots(2,2)
-ax[0,0].text(-45.0, 1e6, 'a)', 
+ax[0,0].text(-38.0, 1e6, 'a)', 
              fontsize='medium', verticalalignment='top', fontfamily='serif',
              bbox=dict(facecolor='w', edgecolor='none', pad=3.0))
 h1 = ax[0,0].hist(mPL_diff, bins=n_bins)
@@ -56,18 +56,19 @@ ax[0,0].axvline(x=h1[1][h1_min], color='k', linestyle='dashed', linewidth=0.5, l
 ax[0,0].axvline(x=h1[1][h1_max], color='k', linestyle='dashed', linewidth=0.5)
 # ax[0,0].set_xticks(list(ax[0,0].get_xticks()) + [-20., -15., -10, -5., 5., 10., 15., 20.])
 # ax[0,0].xaxis.set_major_locator(plt.MaxNLocator(5))
-ax[0,0].xaxis.set_minor_locator(ticker.MultipleLocator(5))
+# ax[0,0].xaxis.set_minor_locator(ticker.MultipleLocator(5))
 ax[0,0].set_title('Moist Large Scale Precip')
 ax[0,0].set_ylabel('N')
 ax[0,0].set_xlabel('ML - CAM (mm/day)')
 ax[0,0].set_yscale('log')
 ax[0,0].legend(fontsize=6)
+ax[0,0].set_xlim((-41,40))
 
-ax[0,1].text(-45.0, 1e6, 'b)', 
+ax[0,1].text(-38.0, 1e6, 'b)', 
              fontsize='medium', verticalalignment='top', fontfamily='serif',
              bbox=dict(facecolor='w', edgecolor='none', pad=3.0))
-h2 = ax[0,1].hist(mPL_diff, bins=n_bins)
-h2_percent = np.asarray(h2[0])/len(mPL_diff)
+h2 = ax[0,1].hist(cPL_diff, bins=n_bins)
+h2_percent = np.asarray(h2[0])/len(cPL_diff)
 sorted_h2_ind = np.argsort(h2_percent)
 percent_h2 = 0.
 i_h2 = []
@@ -81,24 +82,25 @@ print(percent_h2)
 print(i_h2)
 h2_min = min(i_h2)
 h2_max = max(i_h2) + 1
-ax[0,1].axvline(x=h2[1][h2_min], color='k', linestyle='dashed', linewidth=0.5, label='>97%')
+ax[0,1].axvline(x=h2[1][h2_min], color='k', linestyle='dashed', linewidth=0.5, label='>95%')
 ax[0,1].axvline(x=h2[1][h2_max], color='k', linestyle='dashed', linewidth=0.5)
 # ax[0,1].set_xticks(list(ax[0,1].get_xticks()) + [-20., -15., -10, -5., 5., 10., 15., 20.])
 # ax[0,1].xaxis.set_major_locator(plt.MaxNLocator(5))
-ax[0,1].xaxis.set_minor_locator(ticker.MultipleLocator(5))
+# ax[0,1].xaxis.set_minor_locator(ticker.MultipleLocator(5))
 ax[0,1].set_title('Convection Large Scale Precip')
 ax[0,1].set_ylabel('N')
 ax[0,1].set_xlabel('ML - CAM (mm/day)')
 ax[0,1].set_yscale('log')
 ax[0,1].legend(fontsize=6)
+ax[0,1].set_xlim((-41,40))
 
 ax[1,0].axis('off')
 
-ax[1,1].text(-13.0, 1e6, 'c)', 
+ax[1,1].text(-14.0, 1e6, 'c)', 
              fontsize='medium', verticalalignment='top', fontfamily='serif',
              bbox=dict(facecolor='w', edgecolor='none', pad=3.0))
 h3 = ax[1,1].hist(cPC_diff, bins=n_bins)
-h3_percent = np.asarray(h3[0])/len(mPL_diff)
+h3_percent = np.asarray(h3[0])/len(cPC_diff)
 sorted_h3_ind = np.argsort(h3_percent)
 percent_h3 = 0.
 i_h3 = []
@@ -111,7 +113,7 @@ for i in sorted_h3_ind[::-1]:
 print(percent_h3)
 print(i_h3)
 h3_min = min(i_h3)
-h3_max = max(i_h3)
+h3_max = max(i_h3)+1
 ax[1,1].axvline(x=h3[1][h3_min], color='k', linestyle='dashed', linewidth=0.5, label='>95%')
 ax[1,1].axvline(x=h3[1][h3_max], color='k', linestyle='dashed', linewidth=0.5)
 ax[1,1].xaxis.set_minor_locator(ticker.MultipleLocator(5))

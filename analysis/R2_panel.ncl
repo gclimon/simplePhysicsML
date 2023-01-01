@@ -18,17 +18,18 @@ begin
 ; GIVEN AS (time,lev,lat,lon) from 0 to end_time-1
 ;=================================================;
 
-  fname = "R2.nc"
-  path = "/glade/work/glimon/simplePhysML/19/"
+  fname = "R2_50trees.nc"
+  path = "/glade/scratch/glimon/simplePhysML/19/"
   dry = path+"HS/"
   moist = path+"TJ/"
   conv = path+"TJBM/"
+  ; ddT = addfile(dry + "PTTEND/rf/R2.nc","r")
   ddT = addfile(dry + "PTTEND/rf/"+fname,"r")
-  mdT = addfile(moist + "PTTEND/rf/"+fname,"r")
+  mdT = addfile(moist + "PTTEND/rf/R2_aug.nc","r")
   cdT = addfile(conv + "PTTEND/rf/"+fname,"r")
-  mdQ = addfile(moist + "PTEQ/rf/R2_20M.nc","r")
+  mdQ = addfile(moist + "PTEQ/rf/R2_aug.nc","r")
   cdQ = addfile(conv + "PTEQ/rf/"+fname,"r")
-  mPL = addfile(moist + "PRECL/rf/"+fname,"r")
+  mPL = addfile(moist + "PRECL/rf/R2_aug.nc","r")
   cPL = addfile(conv + "PRECL/rf/"+fname,"r")
   cPC = addfile(conv + "PRECC/rf/"+fname,"r")
 

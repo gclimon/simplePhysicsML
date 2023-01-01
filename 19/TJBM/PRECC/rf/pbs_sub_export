@@ -1,0 +1,23 @@
+#!/bin/bash -l
+#PBS -N cCP
+#PBS -A UMIC0069
+#PBS -l select=1:ncpus=1:mem=150GB:ngpus=0
+#PBS -l walltime=00:10:00
+#PBS -j oe
+#PBS -q casper
+
+export TMPDIR=/glade/scratch/$USER/temp
+mkdir -p $TMPDIR
+
+### Load modules required to run the job
+module load intel peak_memusage
+# module load conda
+# conda activate my-npl-tf
+module load ncarenv python/3.7.5
+ncar_pylib 20200417
+
+### Run program
+peak_memusage.exe python run_export.py &> export.out
+
+### Deactivate NCAR PyLib
+conda deactivate

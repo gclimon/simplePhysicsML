@@ -205,10 +205,15 @@ def weighted_avg_std(values, axis, weights):
     values, weights -- Numpy ndarrays with the same shape.
     """
     average = np.average(values, axis=axis, weights=weights)
+    # Fast and numerically precise:
+    # sub = np.empty(values.shape)
+    # for i in range(sub.shape[1]):
+    #     sub[:,i,:] = values[:,i,:] - average
+    # variance = np.average(sub**2, axis=axis, weights=weights)
     variance = np.average((values-average)**2, axis=axis, weights=weights)
     return (average, np.sqrt(variance))
 
-def scale_ui(data, fill=[], l_weights=None, test=False):
+def scale_ui(data, fill=[], l_weights=None, v_weights=None, test=False, lat=False):
     """
     Preprocessing function that scales data to become unitarily invariant for machine learning. This simply 
     means we subtract the mean and divide by the standard deviation.
@@ -220,9 +225,30 @@ def scale_ui(data, fill=[], l_weights=None, test=False):
     else:
         mean = mean.mean(axis=0)
         std = std.std(axis=0)
-    new_data = (data - mean) / std
+    # if v_weights is not None:
+    #     mean,std = weighted_avg_std(mean, axis=0, weights=v_weights)
+    # else:
+    #     mean = mean.mean(axis=0)
+    #     std = std.std(axis=0)
+    # print(std[:,-1])
+    # print(std[:,-2])
+    # print(std[:,-3])
+    if lat:
+        mean[:,-1] = 0.
+        std[:,-1] = 1.
+        # data[:,:,:,:,0] = (data[:,:,:,:,0] - mean[:,0]) / std[:,0]
+        # data[:,:,:,:,1] = (data[:,:,:,:,1] - mean[:,1]) / std[:,1]
+        # data[:,:,:,18:,2] = (data[:,:,:,18:,2] - mean[18:,2]) / std[18:,2]
+        # data[:,:,:,-1,3] = (data[:,:,:,-1,3] - mean[-1,3]) / std[-1,3]
+        # data[:,:,:,-1,4] = (data[:,:,:,-1,4] - mean[-1,4]) / std[-1,4]
+        new_data = (data - mean) / std
+    else:
+        new_data = (data - mean) / std
+    # scaler = StandardScaler()
+    # new_data = scaler.fit_transform(data)
     if test:                        
         return new_data, mean, std
+        # return new_data, np.asarray([scaler])
     else:
         return new_data
 
@@ -236,7 +262,29 @@ def scale_ab(data,fill=[], a=-1.,b=1.,test=False,lat=False):
     dmax = data.max(axis=0).max(axis=0).max(axis=0).max(axis=0)    
     new_data = (data - dmin) / (dmax - dmin) * (b - a) + a
     if test:
+        # return new_data, np.array([scaler])
         return new_data, dmin, dmax
     else:
         return new_data
 
+def coarsen_conv(data):
+    shp = data.shape
+    print(shp)
+    shp2 = (int(shp[0]*2),int(shp[1]/2),shp[2],shp[3])
+    print(shp2)
+    d = np.empty(shp2)
+    for i in range(shp[0]):
+        j = 0 + i*2
+        d[j,:,:,:] = data[i,0:shp[1]:2,:,:]
+        d[j+1,:,:,:] = data[i,1:shp[1]:2,:,:]
+    shp3 = d.shape
+    print(shp3)
+    shp4 = (int(shp3[0]*3),shp3[1],int(shp3[2]/3),shp3[3])
+    print(shp4)
+    new_data = np.empty(shp4)
+    for i in range(shp3[0]):
+        j = 0 + i*3
+        new_data[j,:,:,:] = d[i,:,0:shp3[2]:3,:]
+        new_data[j+1,:,:,:] = d[i,:,1:shp3[2]:3,:]
+        new_data[j+2,:,:,:] = d[i,:,2:shp3[2]:3,:]
+    return new_data
