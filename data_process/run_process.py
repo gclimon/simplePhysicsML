@@ -8,22 +8,23 @@ inspect_data = False
 # Assign runtype
 run_type = 'TJ' # options: HS, TJ, TJBM
 label = 'PTEQ'
-
+opt = ''
 # Choose attributes
 # features = ['T','P','lat']
-features = ['T','P','Q','RELHUM','LHFLX','SHFLX','lat']
+features = ['T','P','Q','LHFLX','SHFLX']
+# features = ['T','P','Q','RELHUM','LHFLX','SHFLX']
 
 if 'lat' in features:
     LAT = True
 else:
     LAT = False
 
-n_train = 4
+n_train = 5
 raw = True
 chop_levs = 0
 
-out_dir = '/glade/work/glimon/simplePhysML/'+res+'/data/'
-data_filename = (run_type+'_'+label+'.npz')
+out_dir = '/glade/scratch/glimon/simplePhysML/'+res+'/data/'
+data_filename = (run_type+'_'+label+opt+'.npz')
 
 print('filename:',data_filename)
 print('Resolution:', res)
@@ -31,16 +32,29 @@ print('Features:', features)
 print('Label:', label)
 
 # Define feature filenames and assign label filenames
+
 train_feature_files = [
-    '/glade/work/glimon/ml_data/'+run_type+'_'+res+'/'+run_type+'_'+res+'.cam.h0.0001-01-01-00000.nc',
-    '/glade/work/glimon/ml_data/'+run_type+'_'+res+'/'+run_type+'_'+res+'.cam.h0.0010-12-22-00000.nc',
-    '/glade/work/glimon/ml_data/'+run_type+'_'+res+'/'+run_type+'_'+res+'.cam.h0.0020-12-12-00000.nc',
-    '/glade/work/glimon/ml_data/'+run_type+'_'+res+'/'+run_type+'_'+res+'.cam.h0.0030-12-02-00000.nc',
-    '/glade/work/glimon/ml_data/'+run_type+'_'+res+'/'+run_type+'_'+res+'.cam.h0.0040-11-22-00000.nc']
+    '/glade/scratch/glimon/ml_data/TJ_19/TJ_19.cam.h0.0010-12-22-00000.nc',
+    '/glade/scratch/glimon/ml_data/TJ_19/TJ_19.cam.h0.0020-12-12-00000.nc',
+    '/glade/scratch/glimon/ml_data/TJ_19/TJ_19.cam.h0.0030-12-02-00000.nc',
+    '/glade/scratch/glimon/ml_data/TJ_19/TJ_19.cam.h0.0040-11-22-00000.nc']
+    # '/glade/scratch/glimon/TJ_19/run/TJ_19.cam.h0.0001-01-01-00000.nc',
+    # '/glade/scratch/glimon/TJ_19/run/TJ_19.cam.h0.0010-12-22-00000.nc',
+    # '/glade/scratch/glimon/TJ_19/run/TJ_19.cam.h0.0020-12-12-00000.nc',
+    # '/glade/scratch/glimon/TJ_19/run/TJ_19.cam.h0.0030-12-02-00000.nc',
+    # '/glade/scratch/glimon/TJ_19/run/TJ_19.cam.h0.0040-11-22-00000.nc']
+    # '/glade/work/glimon/ml_data/'+run_type+'_'+res+'/'+run_type+'_'+res+'.cam.h0.0001-01-01-00000.nc',
+    # '/glade/work/glimon/ml_data/'+run_type+'_'+res+'/'+run_type+'_'+res+'.cam.h0.0010-12-22-00000.nc',
+    # '/glade/work/glimon/ml_data/'+run_type+'_'+res+'/'+run_type+'_'+res+'.cam.h0.0020-12-12-00000.nc',
+    # '/glade/work/glimon/ml_data/'+run_type+'_'+res+'/'+run_type+'_'+res+'.cam.h0.0030-12-02-00000.nc',
+    # '/glade/work/glimon/ml_data/'+run_type+'_'+res+'/'+run_type+'_'+res+'.cam.h0.0040-11-22-00000.nc']
 
 test_feature_files = [    
-    '/glade/work/glimon/ml_data/'+run_type+'_'+res+'/'+run_type+'_'+res+'.cam.h0.0050-11-12-00000.nc']
-#    '/glade/work/glimon/ml_data/'+run_type+'_'+res+'/'+run_type+'_'+res+'.cam.h0.0060-11-02-00000.nc']
+    '/glade/scratch/glimon/ml_data/TJ_19/TJ_19.cam.h0.0050-11-12-00000.nc']
+    # '/glade/scratch/glimon/TJ_19/run/TJ_19.cam.h0.0050-11-12-00000.nc']
+    # '/glade/scratch/glimon/TJ_19/run/TJ_19.cam.h0.0060-11-02-00000.nc']
+    # '/glade/work/glimon/ml_data/'+run_type+'_'+res+'/'+run_type+'_'+res+'.cam.h0.0050-11-12-00000.nc',
+    # '/glade/work/glimon/ml_data/'+run_type+'_'+res+'/'+run_type+'_'+res+'.cam.h0.0060-11-02-00000.nc']
 
 train_label_files = []
 for f in train_feature_files:
@@ -68,14 +82,14 @@ training_features = functions.loadData(train_feature_files[0:n_train],features)
 training_labels = functions.loadData(train_label_files[0:n_train],[label])
 testing_features = functions.loadData(test_feature_files,features)
 testing_labels, PS, time = functions.loadData(test_label_files,[label],get_PS_times=True)
-PS = PS[-312:]
-time = time[-312:]
+PS = PS[-416:]
+time = time[-416:]
 
 # Arange data into single array
-training_features = functions.arangeArrays(training_features,features)[53:] # Disregard first year (spin-up data)
-training_labels = functions.arangeArrays(training_labels,[label])[53:]
-testing_features = functions.arangeArrays(testing_features,features)[-312:] # Take final six years
-testing_labels = functions.arangeArrays(testing_labels,[label])[-312:]
+training_features = functions.arangeArrays(training_features,features)[105:]
+training_labels = functions.arangeArrays(training_labels,[label])[105:]
+testing_features = functions.arangeArrays(testing_features,features)[-416:] # Take final six years
+testing_labels = functions.arangeArrays(testing_labels,[label])[-416:]
 
 if inspect_data:
     D = functions.fill_dict(D,testing_features,time,lev,lat,lon,features,'raw')
@@ -116,9 +130,9 @@ if not raw:
     testing_features = functions.scale_ab(testing_features,lat=LAT)
     testing_labels, dmin, dmax = functions.scale_ab(testing_labels,a=0,test=True)
 
-if inspect_data:
-    D = functions.fill_dict(D,np.rollaxis(testing_features,3,1),time,lev,lat,lon,features,'1_1')
-    D = functions.fill_dict(D,np.rollaxis(testing_labels,3,1),time,lev,lat,lon,[label],'1_1')
+    if inspect_data:
+        D = functions.fill_dict(D,np.rollaxis(testing_features,3,1),time,lev,lat,lon,features,'1_1')
+        D = functions.fill_dict(D,np.rollaxis(testing_labels,3,1),time,lev,lat,lon,[label],'1_1')
     
 if inspect_data:
     xr.Dataset(D).to_netcdf(out_dir+'inspect.nc')

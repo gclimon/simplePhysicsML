@@ -5,12 +5,12 @@ from matplotlib import pyplot as plt
 import xarray as xr
 import numpy as np
 
-data_dir = '/glade/work/glimon/simplePhysML/19/'
+data_dir = '/glade/scratch/glimon/simplePhysML/19/'
 fn = 'rf/results.nc'
-mdT = xr.open_dataset(data_dir + 'TJ/PTTEND/' + fn)
-cdT = xr.open_dataset(data_dir + 'TJBM/PTTEND/' + fn)
-mdQ = xr.open_dataset(data_dir + 'TJ/PTEQ/' + fn)
-cdQ = xr.open_dataset(data_dir + 'TJBM/PTEQ/' + fn)
+mdT = xr.open_dataset(data_dir + 'TJ/PTTEND/rf/results_aug.nc')
+cdT = xr.open_dataset(data_dir + 'TJBM/PTTEND/rf/results_50trees.nc')
+mdQ = xr.open_dataset(data_dir + 'TJ/PTEQ/rf/results_aug.nc')
+cdQ = xr.open_dataset(data_dir + 'TJBM/PTEQ/rf/results_50trees.nc')
 
 lat = mdT['lat'].values
 lon = mdT['lon'].values
@@ -120,4 +120,4 @@ ax[1,1].legend(fontsize=5,loc='lower right')
 
 fig.tight_layout()
 
-plt.savefig('scatter_dT.png',dpi=300)
+plt.savefig('scatter.png',dpi=300)

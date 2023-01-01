@@ -1,0 +1,18 @@
+#!/bin/bash -l
+#PBS -N cCP_R2
+#PBS -A UMIC0069
+#PBS -j oe
+#PBS -q casper
+#PBS -l walltime=00:10:00
+#PBS -l select=1:ncpus=1:mem=150GB
+
+export TMPDIR=/glade/scratch/$USER/temp
+mkdir -p $TMPDIR
+
+### Load modules required to run the job
+module load intel peak_memusage
+module load ncarenv python/3.7.9
+ncar_pylib
+
+### Run program
+peak_memusage.exe python -u R2_line.py &> R2.out

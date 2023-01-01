@@ -18,16 +18,16 @@ begin
 ; GIVEN AS (time,lev,lat,lon) from 0 to end_time-1
 ;=================================================;
 
-  path = "/glade/work/glimon/simplePhysML/19/"
+  path = "/glade/scratch/glimon/simplePhysML/19/"
   dry = path+"HS/"
   moist = path+"TJ/"
   conv = path+"TJBM/"
-  fname = "results.nc"
+  fname = "results_50trees.nc"
   
   name = "dTdt_snap"
 
   ddT_f = addfile(dry + "PTTEND/rf/"+fname,"r")
-  mdT_f = addfile(moist + "PTTEND/rf/"+fname,"r")
+  mdT_f = addfile(moist + "PTTEND/rf/results_aug.nc","r")
   cdT_f = addfile(conv + "PTTEND/rf/"+fname,"r")
 
 ; output format
@@ -92,7 +92,8 @@ printMinMax(cdT_ml_m,True)
 printMinMax(cdT_diff_m,True)
 
   wks  = gsn_open_wks(pltType,name)
-  gsn_define_colormap(wks,"WhViBlGrYeOrReWh")
+  gsn_define_colormap(wks,"WhViBlGrYeOrReWh")	
+
 
 plot = new(9,graphic)
 
@@ -146,7 +147,8 @@ plot = new(9,graphic)
         ; res1@cnLevels = (/-0.6, 0.0, 0.3, 0.6, 1.0, 1.5, 2.0, 3.0, 4.0, 5.0/)
 	; res1@lbLabelStrings = (/"-0.6", "0.0", "0.3", "0.6", "1.0", "1.5", "2.0", "3.0", "4.0", "5.0"/)
 
-        res1@cnMaxLevelValF  =   2.0                 ; max contour color label
+
+        res1@cnMaxLevelValF  =  1.0                 ; max contour color label
         res1@cnMinLevelValF  =   -1.0                  ; min contour color label
         res1@cnLevelSpacingF = 0.2                        ; contour color spacing
 
@@ -158,11 +160,12 @@ plot = new(9,graphic)
 
 	res1@gsnCenterString = "ML - CAM"
 
+
 	; res1@cnLevels =       (/ -0.09, -0.05, -0.02, 0.0, 0.02, 0.05, 0.9, 0.12, 0.15, 0.19/)	
 	; res1@lbLabelStrings = (/"-0.09", "-0.05", "-0.02", "0.0", "0.02", "0.05", "0.09", "0.012", "0.015", "0.019"/)	
-        res1@cnMaxLevelValF  =    0.6                 ; max contour color label
-        res1@cnMinLevelValF  =   -0.3                ; min contour color label
-        res1@cnLevelSpacingF = 0.1                           ; contour color spacing
+        res1@cnMaxLevelValF  =    0.1                 ; max contour color label
+        res1@cnMinLevelValF  =   -0.1                ; min contour color label
+        res1@cnLevelSpacingF = 0.025                           ; contour color spacing
 
 	plot(2) = gsn_csm_contour(wks,ddT_diff_m(:,:),res1)	; plot var
 
@@ -170,9 +173,10 @@ plot = new(9,graphic)
 
 	; res1@cnLevels = (/-2.0, -1.0, 0.0, 1.5, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0/)	
 	; res1@lbLabelStrings = (/"-2.0", "-1.0", "0.0", "1.5", "3.0", "4.0", "5.0", "6.0", "7.0", "8.0"/)	
-        res1@cnMaxLevelValF  =   4.                 ; max contour color label
-        res1@cnMinLevelValF  =   -2.                  ; min contour color label
-        res1@cnLevelSpacingF =   0.5                       ; contour color spacing
+        res1@cnMaxLevelValF  =    8.0                 ; max contour color label
+        res1@cnMinLevelValF  =   -8.0                  ; min contour color label
+        res1@cnLevelSpacingF =   1.0                       ; contour color spacing
+
 
 	res1@gsnCenterString = "CAM"
 	res1@gsnLeftString = "Moist dT/dt"
@@ -183,11 +187,12 @@ plot = new(9,graphic)
 
 	res1@gsnCenterString = "ML - CAM"
 
+
 	; res1@cnLevels = (/-1.3, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5, 2.00, 2.6, 3.3/)	
 	; res1@lbLabelStrings = (/"-1.3", "-1.0", "-0.5", "0.0", "0.5", "1.0", "1.5", "2.0", "2.6", "3.3"/)		
-        res1@cnMaxLevelValF  =    4.0                 ; max contour color label
-        res1@cnMinLevelValF  =   -2.0                 ; min contour color label
-        res1@cnLevelSpacingF = 0.5                           ; contour color spacing
+        res1@cnMaxLevelValF  =    1.0                 ; max contour color label
+        res1@cnMinLevelValF  =   -1.0                 ; min contour color label
+        res1@cnLevelSpacingF = 0.25                           ; contour color spacing
 
 	plot(5) = gsn_csm_contour(wks,mdT_diff_m(:,:),res1)	; plot var
 
@@ -198,9 +203,9 @@ plot = new(9,graphic)
 	res1@gsnCenterString = "CAM"
        	res1@gsnLeftString = "Conv. dT/dt"
 
-        res1@cnMaxLevelValF  =    6.0                 ; max contour color label
-        res1@cnMinLevelValF  =   -3.0                 ; min contour color label
-        res1@cnLevelSpacingF = 1.                           ; contour color spacing
+        res1@cnMaxLevelValF  =    5.0                 ; max contour color label
+        res1@cnMinLevelValF  =   -5.0                 ; min contour color label
+        res1@cnLevelSpacingF = 1.0                           ; contour color spacing
 
 	 plot(6) = gsn_csm_contour(wks,cdT_m(:,:),res1)	; plot var
 
@@ -211,9 +216,9 @@ plot = new(9,graphic)
 	res1@gsnCenterString = "ML"
 	plot(7) = gsn_csm_contour(wks,cdT_ml_m(:,:),res1)	; plot var
 
-        res1@cnMaxLevelValF  =    5.0                 ; max contour color label
-        res1@cnMinLevelValF  =   -4.0                 ; min contour color label
-        res1@cnLevelSpacingF =    1.0                           ; contour color spacing
+        res1@cnMaxLevelValF  =   3.0                 ; max contour color label
+        res1@cnMinLevelValF  =   -3.0                 ; min contour color label
+        res1@cnLevelSpacingF =   0.5                           ; contour color spacing
 
 	res1@gsnCenterString = "ML - CAM"
 	plot(8) = gsn_csm_contour(wks,cdT_diff_m(:,:),res1)	; plot var

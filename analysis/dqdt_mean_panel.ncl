@@ -18,15 +18,15 @@ begin
 ; GIVEN AS (time,lev,lat,lon) from 0 to end_time-1
 ;=================================================;
 
-  path = "/glade/work/glimon/simplePhysML/19/"
+  path = "/glade/scratch/glimon/simplePhysML/19/"
   dry = path+"HS/"
   moist = path+"TJ/"
   conv = path+"TJBM/"
-  fname = "results.nc"
+  fname = "results_50trees.nc"
   
   name = "dQdt_panel"
 
-  mdQ_f = addfile(moist + "PTEQ/rf/fname,"r")
+  mdQ_f = addfile(moist + "PTEQ/rf/results_aug.nc","r")
   cdQ_f = addfile(conv + "PTEQ/rf/"+fname,"r")
 
 ; output format
@@ -153,8 +153,8 @@ plot = new(6,graphic)
 
 	; res1@cnLevels =       (/ -3.0,   -3.0,   -2.0,   -1.0,   -0.5,   0.0,   0.5,   1.0,   2.0,   2.3/)
 	; res1@lbLabelStrings = (/"-3.0", "-3.0", "-2.0", "-1.0", "-0.5", "0.0", "0.5", "1.0", "2.0", "2.3"/)
-        res1@cnMaxLevelValF  =   2.0                 ; max contour color label
-        res1@cnMinLevelValF  =   -3.0                  ; min contour color label
+        res1@cnMaxLevelValF  =    2.5                 ; max contour color label
+        res1@cnMinLevelValF  =   -2.5                  ; min contour color label
         res1@cnLevelSpacingF = 0.5                         ; contour color spacing
 
 	res1@gsnCenterString = "CAM"
@@ -193,9 +193,9 @@ plot = new(6,graphic)
 
 	; res1@cnLevels =       (/ -0.04,   -0.03,   -0.02,   -0.01,   -0.05,   0.0,   0.05,   0.01,   0.02,   0.03/)
 	; res1@lbLabelStrings = (/"-0.04", "-0.03", "-0.02", "-0.01", "-0.05", "0.0", "0.05", "0.01", "0.02", "0.03"/)
-        res1@cnMaxLevelValF  =    0.02                 ; max contour color label
-        res1@cnMinLevelValF  =   -0.02                 ; min contour color label
-        res1@cnLevelSpacingF = 0.005                           ; contour color spacing
+        res1@cnMaxLevelValF  =    0.04                 ; max contour color label
+        res1@cnMinLevelValF  =   -0.04                 ; min contour color label
+        res1@cnLevelSpacingF = 0.01                           ; contour color spacing
 
 	plot(5) = gsn_csm_contour(wks,cdQ_diff_m(:,:),res1)	; plot var
 

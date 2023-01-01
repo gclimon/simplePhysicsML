@@ -1,0 +1,25 @@
+#!/bin/bash -l
+#PBS -N hist
+#PBS -A UMIC0069
+#PBS -l select=1:ncpus=1:mem=50GB
+#PBS -l walltime=10:00
+#PBS -j oe
+#PBS -q casper
+
+export TMPDIR=/glade/scratch/$USER/temp
+mkdir -p $TMPDIR
+
+### Load modules required to run the job
+module load intel peak_memusage
+module load ncarenv python/3.7.9
+ncar_pylib
+
+### Run program
+# peak_memusage.exe python R2train.py &> R2train.out
+# peak_memusage.exe python scatter_precip.py &> scatter_precip.out
+# peak_memusage.exe python scatter.py &> scatter.out
+peak_memusage.exe python histogram.py &> hist.out
+peak_memusage.exe python histogram_precip.py &> hist_precip.out
+
+### Deactivate NCAR PyLib
+deactivate
